@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import { ORDER_STATUS } from "../../../lib/constants";
 
 const statusTimeline = [
@@ -10,15 +10,25 @@ const statusTimeline = [
 ];
 
 const statusColors = {
-  pending: "badge-warning",
-  confirmed: "badge-info",
-  packed: "badge-secondary",
-  shipped: "badge-primary",
-  delivered: "badge-success",
-  returned: "badge-error",
+  pending: "bg-amber-50 text-amber-600 border-amber-200",
+  confirmed: "bg-blue-50 text-blue-600 border-blue-200",
+  packed: "bg-purple-50 text-purple-600 border-purple-200",
+  shipped: "bg-cyan-50 text-cyan-600 border-cyan-200",
+  delivered: "bg-emerald-50 text-emerald-600 border-emerald-200",
+  returned: "bg-red-50 text-red-600 border-red-200",
 };
 
-export default function OrderDrawer({ order, onClose, onStatusChange }) {
+function formatDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "2-digit",
+  });
+}
+
+export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }) {
   if (!order) return null;
 
   const currentIndex = statusTimeline.indexOf(order.status);
@@ -32,65 +42,72 @@ export default function OrderDrawer({ order, onClose, onStatusChange }) {
       />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-base-100 shadow-2xl">
+      <div className="fixed right-0 top-0 z-50 flex h-full w-full sm:max-w-md flex-col bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-5 py-4">
+        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 shrink-0">
           <div>
-            <p className="text-xs text-base-content/50">Order</p>
-            <h2 className="font-bold">{order.displayId || order.id}</h2>
+            <p className="text-xs text-gray-400">Order</p>
+            <h2 className="font-bold text-gray-900">{order.displayId || order.id}</h2>
           </div>
-          <button onClick={onClose} className="btn btn-ghost btn-sm btn-circle">
-            <X size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <button
+                onClick={() => onDelete(order.id)}
+                className="text-gray-300 hover:text-red-500 transition p-1"
+                title="Delete"
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6 min-h-0">
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6 min-h-0 pb-[env(safe-area-inset-bottom)]">
 
           {/* Customer */}
           <section>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-base-content/40">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
               Customer
             </p>
-            <p className="font-semibold">{order.customer}</p>
-            <p className="text-sm text-base-content/60">{order.phone}</p>
-            <p className="text-sm text-base-content/60">{order.address}</p>
+            <p className="font-semibold text-gray-900">{order.customer}</p>
+            <p className="text-sm text-gray-500">{order.phone}</p>
+            <p className="text-sm text-gray-500">{order.address}</p>
           </section>
 
           {/* Order Info */}
           <section>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-base-content/40">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
               Order Info
             </p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-base-200 p-3">
-                <p className="text-xs text-base-content/50">Product</p>
-                <p className="font-medium text-sm">{order.product}</p>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-400">Product</p>
+                <p className="font-medium text-sm text-gray-800">{order.product}</p>
               </div>
-              <div className="rounded-lg bg-base-200 p-3">
-                <p className="text-xs text-base-content/50">Amount</p>
-                <p className="font-medium text-sm">৳{order.amount}</p>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-400">Amount</p>
+                <p className="font-medium text-sm text-gray-800">৳{order.amount}</p>
               </div>
-              <div className="rounded-lg bg-base-200 p-3">
-                <p className="text-xs text-base-content/50">Delivery</p>
-                <p className="font-medium text-sm">৳{order.deliveryCharge}</p>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-400">Delivery</p>
+                <p className="font-medium text-sm text-gray-800">৳{order.deliveryCharge}</p>
               </div>
-              <div className="rounded-lg bg-base-200 p-3">
-                <p className="text-xs text-base-content/50">Payment</p>
-                <p className="font-medium text-sm">{order.payment}</p>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-400">Payment</p>
+                <p className="font-medium text-sm text-gray-800">{order.payment}</p>
               </div>
-              <div className="rounded-lg bg-base-200 p-3">
-                <p className="text-xs text-base-content/50">Courier</p>
-                <p className="font-medium text-sm">{order.courier}</p>
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-400">Courier</p>
+                <p className="font-medium text-sm text-gray-800">{order.courier}</p>
               </div>
-              <div className="rounded-lg bg-base-200 p-3">
-                <p className="text-xs text-base-content/50">Date</p>
-                <p className="font-medium text-sm">
-                  {new Date(order.createdAt).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "2-digit",
-                  })}
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-400">Date</p>
+                <p className="font-medium text-sm text-gray-800">
+                  {formatDate(order.createdAt)}
                 </p>
               </div>
             </div>
@@ -99,10 +116,10 @@ export default function OrderDrawer({ order, onClose, onStatusChange }) {
           {/* Notes */}
           {order.notes && (
             <section>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-base-content/40">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
                 Notes
               </p>
-              <p className="rounded-lg bg-base-200 px-4 py-3 text-sm">
+              <p className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-700">
                 {order.notes}
               </p>
             </section>
@@ -111,7 +128,7 @@ export default function OrderDrawer({ order, onClose, onStatusChange }) {
           {/* Timeline */}
           {order.status !== ORDER_STATUS.RETURNED && (
             <section>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-base-content/40">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
                 Timeline
               </p>
               <div className="space-y-3">
@@ -121,12 +138,12 @@ export default function OrderDrawer({ order, onClose, onStatusChange }) {
                     <div key={step} className="flex items-center gap-3">
                       <div
                         className={`h-3 w-3 rounded-full shrink-0 ${
-                          done ? "bg-emerald-500" : "bg-base-300"
+                          done ? "bg-emerald-500" : "bg-gray-200"
                         }`}
                       />
                       <span
                         className={`capitalize text-sm ${
-                          done ? "font-medium" : "text-base-content/40"
+                          done ? "font-medium text-gray-800" : "text-gray-400"
                         }`}
                       >
                         {step}
@@ -145,11 +162,11 @@ export default function OrderDrawer({ order, onClose, onStatusChange }) {
 
           {/* Status */}
           <section>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-base-content/40">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
               Update Status
             </p>
             <select
-              className="select select-bordered w-full"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white"
               value={order.status}
               onChange={(e) => onStatusChange(order.id, e.target.value)}
             >

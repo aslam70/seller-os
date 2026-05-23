@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { User, Users } from "lucide-react";
+import { ArrowLeft, User, Users } from "lucide-react";
 import CustomerPanel from "./components/CustomerPanel";
 import { useOrders } from "../orders/hooks/useOrders";
 import EmptyState from "../../components/EmptyState";
@@ -40,7 +40,7 @@ export default function CustomersPage() {
   }, [orders]);
 
   return (
-    <div className="p-7 max-w-6xl">
+    <div>
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">Customers</h1>
         <p className="text-sm text-gray-400 mt-0.5">
@@ -49,7 +49,8 @@ export default function CustomersPage() {
       </div>
 
       <div className="flex gap-5">
-        <div className="w-72 shrink-0 space-y-2">
+        {/* Customer list — hidden on mobile when a customer is selected */}
+        <div className={`w-72 shrink-0 space-y-2 ${selected ? "hidden lg:block" : ""}`}>
           {customers.length === 0 ? (
             <EmptyState
               icon={Users}
@@ -100,20 +101,33 @@ export default function CustomersPage() {
           })}
         </div>
 
-        {selected ? (
-          <CustomerPanel customer={selected} />
-        ) : (
-          <div className="flex-1 bg-white rounded-2xl border border-gray-100 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <User size={20} className="text-gray-400" />
-              </div>
-              <p className="text-sm text-gray-400">
-                Select a customer to view details
-              </p>
+        {/* Mobile: full-screen panel with back button */}
+        <div className={`flex-1 ${selected ? "" : "hidden lg:block"}`}>
+          {selected ? (
+            <div className="lg:block">
+              {/* Mobile back button */}
+              <button
+                onClick={() => setSelected(null)}
+                className="lg:hidden flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-4 transition"
+              >
+                <ArrowLeft size={16} />
+                Back to customers
+              </button>
+              <CustomerPanel customer={selected} />
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="flex-1 bg-white rounded-2xl border border-gray-100 flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                  <User size={20} className="text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-400">
+                  Select a customer to view details
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

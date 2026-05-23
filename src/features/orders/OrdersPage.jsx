@@ -6,6 +6,17 @@ import AddOrderModal from "./components/AddOrderModal";
 import OrderDrawer from "./components/OrderDrawer";
 import EmptyState from "../../components/EmptyState";
 import { useOrders } from "./hooks/useOrders";
+import { STATUS_COLORS } from "./ordersConstants";
+
+function formatDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "2-digit",
+  });
+}
 
 export default function OrdersPage() {
   const { orders, loading, addOrder, updateStatus, deleteOrder } = useOrders();
@@ -33,7 +44,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="p-7 max-w-6xl">
+    <div className="max-w-6xl">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Orders</h1>
@@ -46,7 +57,8 @@ export default function OrdersPage() {
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition"
         >
           <Plus size={15} />
-          Add Order
+          <span className="hidden sm:inline">Add Order</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </div>
 
@@ -64,7 +76,60 @@ export default function OrdersPage() {
         />
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+      {/* Mobile card list */}
+      <div className="lg:hidden space-y-2">
+        {filtered.length === 0 ? (
+          orders.length === 0 ? (
+            <EmptyState
+              icon={ShoppingBag}
+              title="No orders yet"
+              description="Add your first order to start tracking sales and deliveries."
+              action={
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition"
+                >
+                  <Plus size={14} /> Add order
+                </button>
+              }
+            />
+          ) : (
+            <EmptyState
+              icon={Search}
+              title="No results found"
+              description={`No orders match "${search}". Try a different name or product.`}
+            />
+          )
+        ) : (
+          filtered.map((order) => (
+            <button
+              key={order.id}
+              onClick={() => setSelectedOrder(order)}
+              className="w-full text-left bg-white border border-gray-100 rounded-xl px-4 py-3.5 hover:border-gray-200 transition"
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-sm font-semibold text-gray-800">{order.customer}</p>
+                <span
+                  className={`text-xs px-2 py-0.5 rounded-lg border font-medium capitalize ${STATUS_COLORS[order.status]}`}
+                >
+                  {order.status}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-1">{order.product}</p>
+              <div className="flex items-center justify-between text-xs text-gray-400">
+                <span>
+                  ৳{order.amount}
+                  {order.phone ? ` · ${order.phone}` : ""}
+                </span>
+                <span>{formatDate(order.createdAt)}</span>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
         <table className="w-full text-sm min-w-[900px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
@@ -134,6 +199,10 @@ export default function OrdersPage() {
         onStatusChange={(id, status) => {
           updateStatus(id, status);
           setSelectedOrder(prev => ({ ...prev, status }));
+        }}
+        onDelete={(id) => {
+          deleteOrder(id);
+          setSelectedOrder(null);
         }}
       />
     </div>

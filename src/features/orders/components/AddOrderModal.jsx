@@ -45,122 +45,146 @@ export default function AddOrderModal({ show, onClose, onAdd }) {
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h2 className="text-base font-bold text-gray-900">New Order</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Fill in the order details below</p>
-        </div>
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
 
-        <div className="px-6 py-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "Customer Name", key: "customer", span: true },
-              { label: "Phone", key: "phone" },
-            ].map(({ label, key, span }) => (
-              <div key={key} className={span ? "col-span-2" : ""}>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
-                <input
-                  type="text"
-                  value={form[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                />
+      {/* Modal / Bottom sheet */}
+      <div className="fixed inset-x-0 bottom-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 flex flex-col max-h-[90dvh] sm:max-h-[80vh] sm:max-w-md sm:w-full">
+        <div className="mt-auto sm:mt-0 bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90dvh] sm:max-h-[80vh]">
+          {/* Header */}
+          <div className="shrink-0 px-5 pt-5 pb-3 sm:px-6 sm:pt-6 sm:pb-4 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-gray-900">New Order</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Fill in the order details below</p>
               </div>
-            ))}
-
-            {/* Product dropdown */}
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Product</label>
-              {products.length > 0 ? (
-                <select
-                  onChange={handleProductSelect}
-                  defaultValue=""
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                >
-                  <option value="" disabled>Select a product</option>
-                  {products.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}{p.price > 0 ? ` — ৳${p.price}` : ""}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type="text"
-                  placeholder="No products yet — type manually"
-                  value={form.product}
-                  onChange={(e) => setForm({ ...form, product: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                />
-              )}
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-
-            {[
-              { label: "Amount (৳)", key: "amount", type: "number" },
-              { label: "Delivery Charge", key: "deliveryCharge", type: "number" },
-              { label: "Address", key: "address", span: true },
-            ].map(({ label, key, type = "text", span }) => (
-              <div key={key} className={span ? "col-span-2" : ""}>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
-                <input
-                  type={type}
-                  value={form[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                />
-              </div>
-            ))}
-
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Courier</label>
-              <select
-                value={form.courier}
-                onChange={(e) => setForm({ ...form, courier: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              >
-                {COURIERS.map((c) => (<option key={c}>{c}</option>))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Payment Type</label>
-              <select
-                value={form.payment}
-                onChange={(e) => setForm({ ...form, payment: e.target.value })}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              >
-                {PAYMENT_METHODS.map((p) => (<option key={p}>{p}</option>))}
-              </select>
-            </div>
-
-            <div className="col-span-2">
-              <label className="block text-xs font-medium text-gray-600 mb-1.5">Notes</label>
-              <textarea
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                rows={2}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none"
-              />
+            {/* Drag handle for mobile */}
+            <div className="sm:hidden flex justify-center mt-2">
+              <div className="w-10 h-1 rounded-full bg-gray-300" />
             </div>
           </div>
-        </div>
 
-        <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 border border-gray-200 rounded-xl py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition font-medium"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2.5 text-sm font-medium transition"
-          >
-            Add Order
-          </button>
+          {/* Scrollable form */}
+          <div className="overflow-y-auto px-5 sm:px-6 py-4 space-y-4 pb-[env(safe-area-inset-bottom)] sm:pb-4">
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "Customer Name", key: "customer", span: true },
+                { label: "Phone", key: "phone" },
+              ].map(({ label, key, span }) => (
+                <div key={key} className={span ? "col-span-2" : ""}>
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
+                  <input
+                    type="text"
+                    inputMode={key === "phone" ? "numeric" : "text"}
+                    value={form[key]}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </div>
+              ))}
+
+              {/* Product dropdown */}
+              <div className="col-span-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Product</label>
+                {products.length > 0 ? (
+                  <select
+                    onChange={handleProductSelect}
+                    defaultValue=""
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  >
+                    <option value="" disabled>Select a product</option>
+                    {products.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}{p.price > 0 ? ` — ৳${p.price}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    placeholder="No products yet — type manually"
+                    value={form.product}
+                    onChange={(e) => setForm({ ...form, product: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                )}
+              </div>
+
+              {[
+                { label: "Amount (৳)", key: "amount" },
+                { label: "Delivery Charge", key: "deliveryCharge" },
+                { label: "Address", key: "address", span: true },
+              ].map(({ label, key, span }) => (
+                <div key={key} className={span ? "col-span-2" : ""}>
+                  <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={form[key]}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                </div>
+              ))}
+
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Courier</label>
+                <select
+                  value={form.courier}
+                  onChange={(e) => setForm({ ...form, courier: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                >
+                  {COURIERS.map((c) => (<option key={c}>{c}</option>))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Payment Type</label>
+                <select
+                  value={form.payment}
+                  onChange={(e) => setForm({ ...form, payment: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                >
+                  {PAYMENT_METHODS.map((p) => (<option key={p}>{p}</option>))}
+                </select>
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Notes</label>
+                <textarea
+                  value={form.notes}
+                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  rows={2}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="shrink-0 px-5 sm:px-6 py-4 border-t border-gray-100 flex gap-3 pb-[env(safe-area-inset-bottom)] sm:pb-4">
+            <button
+              onClick={onClose}
+              className="flex-1 border border-gray-200 rounded-xl py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-2.5 text-sm font-medium transition"
+            >
+              Add Order
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

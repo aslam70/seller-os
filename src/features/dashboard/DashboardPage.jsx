@@ -65,14 +65,14 @@ export default function DashboardPage() {
   const totalRevenue = getDeliveredRevenue(orders);
 
   return (
-    <div className="p-7 max-w-4xl">
+    <div className="max-w-4xl">
       <div className="mb-7">
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-400 mt-0.5">Seller OS — overview</p>
       </div>
 
       {orders.length === 0 && (
-        <div className="mb-6 bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
+        <div className="mb-6 bg-emerald-50 border border-emerald-100 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start gap-4">
           <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
             <PackageOpen size={16} className="text-emerald-600" />
           </div>
