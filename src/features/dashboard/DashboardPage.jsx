@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { ORDER_STATUS } from "../../lib/constants";
 import { getDeliveredRevenue } from "../../lib/selectors";
+import { useOrders } from "../orders/hooks/useOrders";
 
 const STAT_CONFIG = [
   {
@@ -43,7 +44,8 @@ const STAT_CONFIG = [
   },
 ];
 
-export default function DashboardPage({ orders }) {
+export default function DashboardPage() {
+  const { orders } = useOrders();
   const counts = {
     total: orders.length,
     [ORDER_STATUS.PENDING]: orders.filter(

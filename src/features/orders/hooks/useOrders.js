@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabase";
 import toast from "react-hot-toast";
 import { ORDER_STATUS } from "../../../lib/constants";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 function mapRow(row) {
   return {
@@ -23,11 +24,14 @@ function mapRow(row) {
 }
 
 export function useOrders() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!user) return;
+
     const fetchOrders = async () => {
       try {
         setLoading(true);
@@ -47,7 +51,7 @@ export function useOrders() {
     };
 
     fetchOrders();
-  }, []);
+  }, [user]);
 
   const addOrder = async (formData) => {
     try {
@@ -62,6 +66,7 @@ export function useOrders() {
         status: ORDER_STATUS.PENDING,
         courier: formData.courier || "Pathao",
         notes: formData.notes || "",
+        user_id: user.id,
       };
 
       const { data, error } = await supabase

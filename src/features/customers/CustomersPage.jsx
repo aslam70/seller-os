@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { User } from "lucide-react";
 import CustomerPanel from "./components/CustomerPanel";
+import { useOrders } from "../orders/hooks/useOrders";
 
 const RISK_CONFIG = {
   high: { label: "High Risk", class: "bg-red-50 text-red-600 border-red-200" },
@@ -22,7 +23,8 @@ function riskLevel(orders) {
   return "low";
 }
 
-export default function CustomersPage({ orders }) {
+export default function CustomersPage() {
+  const { orders } = useOrders();
   const [selected, setSelected] = useState(null);
 
   const customers = useMemo(() => {

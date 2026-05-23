@@ -1,5 +1,6 @@
-import { NavLink } from "react-router-dom";
-import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag, LogOut } from "lucide-react";
+import { useAuth } from "../features/auth/hooks/useAuth";
 
 const links = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -29,6 +30,14 @@ export default function Sidebar({ open, onClose }) {
 }
 
 function Inner({ onClose }) {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
+
   return (
     <>
       <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
@@ -65,15 +74,22 @@ function Inner({ onClose }) {
       </nav>
 
       <div className="px-4 py-4 border-t border-gray-100">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 mb-3">
           <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700">
-            N
+            {user?.email?.[0]?.toUpperCase() || "S"}
           </div>
-          <div>
-            <p className="text-xs font-semibold text-gray-700">Nusrat Fashion</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-gray-700 truncate">{user?.email}</p>
             <p className="text-xs text-gray-400">Free Plan</p>
           </div>
         </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all"
+        >
+          <LogOut size={14} />
+          Logout
+        </button>
       </div>
     </>
   );

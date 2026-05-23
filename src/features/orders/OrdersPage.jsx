@@ -5,7 +5,10 @@ import OrderRow from "./components/OrderRow";
 import AddOrderModal from "./components/AddOrderModal";
 import OrderDrawer from "./components/OrderDrawer";
 
-export default function OrdersPage({ orders, loading, addOrder, updateStatus, deleteOrder }) {
+import { useOrders } from "./hooks/useOrders";
+
+export default function OrdersPage() {
+  const { orders, loading, addOrder, updateStatus, deleteOrder } = useOrders();
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
