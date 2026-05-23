@@ -1,28 +1,9 @@
 import { useState, useMemo } from "react";
 import { ArrowLeft, User, Users } from "lucide-react";
 import CustomerPanel from "./components/CustomerPanel";
-import { useOrders } from "../orders/hooks/useOrders";
 import EmptyState from "../../components/EmptyState";
-
-const RISK_CONFIG = {
-  high: { label: "High Risk", class: "bg-red-50 text-red-600 border-red-200" },
-  medium: {
-    label: "Medium Risk",
-    class: "bg-amber-50 text-amber-600 border-amber-200",
-  },
-  low: {
-    label: "Trusted",
-    class: "bg-emerald-50 text-emerald-600 border-emerald-200",
-  },
-};
-
-function riskLevel(orders) {
-  const returns = orders.filter((o) => o.status === "returned").length;
-  const ratio = returns / orders.length;
-  if (ratio >= 0.5) return "high";
-  if (ratio > 0) return "medium";
-  return "low";
-}
+import { useOrders } from "../orders/hooks/useOrders";
+import { riskLevel, customerSpent, RISK_CONFIG } from "./hooks/useCustomers";
 
 export default function CustomersPage() {
   const { orders } = useOrders();
@@ -59,9 +40,7 @@ export default function CustomersPage() {
             />
           ) : customers.map((c) => {
             const risk = riskLevel(c.orders);
-            const spent = c.orders
-              .filter((o) => o.status === "delivered")
-              .reduce((s, o) => s + o.amount, 0);
+            const spent = customerSpent(c.orders);
             const isActive = selected?.name === c.name;
 
             return (
