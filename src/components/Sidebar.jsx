@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag, LogOut } from "lucide-react";
+import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag, Package, LogOut } from "lucide-react";
 import { useAuth } from "../features/auth/hooks/useAuth";
 
 const links = [
@@ -7,6 +7,7 @@ const links = [
   { to: "/orders", label: "Orders", icon: ClipboardList },
   { to: "/kanban", label: "Kanban", icon: Kanban },
   { to: "/customers", label: "Customers", icon: Users },
+  { to: "/products", label: "Products", icon: Package },
 ];
 
 export default function Sidebar({ open, onClose }) {
