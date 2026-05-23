@@ -5,10 +5,18 @@ import OrderRow from "./components/OrderRow";
 import AddOrderModal from "./components/AddOrderModal";
 import OrderDrawer from "./components/OrderDrawer";
 
-export default function OrdersPage({ orders, addOrder, updateStatus, deleteOrder }) {
+export default function OrdersPage({ orders, loading, addOrder, updateStatus, deleteOrder }) {
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <span className="loading loading-spinner loading-md text-emerald-500" />
+      </div>
+    );
+  }
 
   const filtered = orders.filter(
     (o) =>

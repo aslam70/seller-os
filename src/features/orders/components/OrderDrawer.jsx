@@ -37,7 +37,7 @@ export default function OrderDrawer({ order, onClose, onStatusChange }) {
         <div className="flex items-center justify-between border-b px-5 py-4">
           <div>
             <p className="text-xs text-base-content/50">Order</p>
-            <h2 className="font-bold">{order.id}</h2>
+            <h2 className="font-bold">{order.displayId || order.id}</h2>
           </div>
           <button onClick={onClose} className="btn btn-ghost btn-sm btn-circle">
             <X size={18} />

@@ -7,7 +7,7 @@ import KanbanPage from "./features/kanban/KanbanPage";
 import CustomersPage from "./features/customers/CustomersPage";
 
 export default function App() {
-  const { orders, addOrder, updateStatus, deleteOrder } = useOrders();
+  const { orders, loading, addOrder, updateStatus, deleteOrder } = useOrders();
 
   return (
     <Routes>
@@ -18,6 +18,7 @@ export default function App() {
           element={
             <OrdersPage
               orders={orders}
+              loading={loading}
               addOrder={addOrder}
               updateStatus={updateStatus}
               deleteOrder={deleteOrder}

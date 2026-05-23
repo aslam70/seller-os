@@ -1,0 +1,9 @@
+customer,phone,address,product,amount,delivery_charge,payment,status,courier,notes
+Rahim Uddin,01711111111,"Mirpur-10, Dhaka","Punjabi (White, XL)",850,60,COD,pending,Pathao,
+Karim Hossain,01722222222,"Agrabad, Chittagong",Saree (Jamdani),1200,100,bKash,delivered,Steadfast,Customer requested evening delivery
+Nasrin Akter,01733333333,"Zindabazar, Sylhet","Kurti (Pink, M)",650,120,COD,packed,Redx,
+Rima Begum,01744444444,"Shaheb Bazar, Rajshahi","Dress (Floral, S)",950,80,COD,shipped,Pathao,Fragile handle with care
+Sumon Mia,01755555555,"Boyra, Khulna","Panjabi (Blue, L)",750,90,Nagad,returned,Steadfast,Wrong size delivered
+Farida Khanam,01766666666,"Sadar, Comilla",Hijab Set (Black),480,70,COD,confirmed,Redx,
+Tariq Ahmed,01777777777,"Uttara, Dhaka","Sherwani (Cream, XL)",2400,60,bKash,confirmed,Pathao,Wedding order must deliver before May 25
+Poly Rani Das,01788888888,Jessore Sadar,"Salwar Kameez (Green, M)",1100,90,COD,pending,Steadfast,
