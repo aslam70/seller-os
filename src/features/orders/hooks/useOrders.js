@@ -3,6 +3,25 @@ import { supabase } from "../../../lib/supabase";
 import toast from "react-hot-toast";
 import { ORDER_STATUS } from "../../../lib/constants";
 
+function mapRow(row) {
+  return {
+    id: row.id,
+    displayId: row.display_id,
+    customer: row.customer,
+    phone: row.phone,
+    address: row.address,
+    product: row.product,
+    amount: row.amount,
+    deliveryCharge: row.delivery_charge,
+    payment: row.payment,
+    status: row.status,
+    courier: row.courier,
+    notes: row.notes,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 export function useOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +37,7 @@ export function useOrders() {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        setOrders(data || []);
+        setOrders((data || []).map(mapRow));
       } catch (err) {
         setError(err.message);
         toast.error("Failed to load orders");
@@ -53,7 +72,7 @@ export function useOrders() {
 
       if (error) throw error;
 
-      setOrders((prev) => [data, ...prev]);
+      setOrders((prev) => [mapRow(data), ...prev]);
       toast.success("Order added");
     } catch (err) {
       toast.error("Failed to add order");
