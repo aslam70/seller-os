@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import {
   ShoppingBag,
   Clock,
   CheckCircle,
   RotateCcw,
   TrendingUp,
+  PackageOpen,
 } from "lucide-react";
 import { ORDER_STATUS } from "../../lib/constants";
 import { getDeliveredRevenue } from "../../lib/selectors";
@@ -45,6 +47,7 @@ const STAT_CONFIG = [
 ];
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const { orders } = useOrders();
   const counts = {
     total: orders.length,
@@ -67,6 +70,34 @@ export default function DashboardPage() {
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-400 mt-0.5">Seller OS — overview</p>
       </div>
+
+      {orders.length === 0 && (
+        <div className="mb-6 bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
+          <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+            <PackageOpen size={16} className="text-emerald-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-emerald-800 mb-0.5">Welcome to Seller OS</p>
+            <p className="text-xs text-emerald-600 leading-relaxed">
+              Start by adding your products, then create your first order to see stats here.
+            </p>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={() => navigate("/products")}
+              className="text-xs px-3 py-1.5 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition"
+            >
+              Add products
+            </button>
+            <button
+              onClick={() => navigate("/orders")}
+              className="text-xs px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
+            >
+              New order
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 mb-6">
         {STAT_CONFIG.map(({ key, label, icon: Icon, color, bg, border }) => (

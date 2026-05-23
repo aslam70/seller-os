@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
-import { User } from "lucide-react";
+import { User, Users } from "lucide-react";
 import CustomerPanel from "./components/CustomerPanel";
 import { useOrders } from "../orders/hooks/useOrders";
+import EmptyState from "../../components/EmptyState";
 
 const RISK_CONFIG = {
   high: { label: "High Risk", class: "bg-red-50 text-red-600 border-red-200" },
@@ -49,7 +50,13 @@ export default function CustomersPage() {
 
       <div className="flex gap-5">
         <div className="w-72 shrink-0 space-y-2">
-          {customers.map((c) => {
+          {customers.length === 0 ? (
+            <EmptyState
+              icon={Users}
+              title="No customers yet"
+              description="Customers appear automatically once you add orders."
+            />
+          ) : customers.map((c) => {
             const risk = riskLevel(c.orders);
             const spent = c.orders
               .filter((o) => o.status === "delivered")

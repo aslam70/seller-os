@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, ShoppingBag } from "lucide-react";
 import { ORDER_STATUS } from "../../lib/constants";
 import OrderRow from "./components/OrderRow";
 import AddOrderModal from "./components/AddOrderModal";
 import OrderDrawer from "./components/OrderDrawer";
-
+import EmptyState from "../../components/EmptyState";
 import { useOrders } from "./hooks/useOrders";
 
 export default function OrdersPage() {
@@ -83,11 +83,28 @@ export default function OrdersPage() {
           <tbody className="divide-y divide-gray-50">
             {filtered.length === 0 ? (
               <tr>
-                <td
-                  colSpan={10}
-                  className="px-5 py-10 text-center text-sm text-gray-400"
-                >
-                  No orders found.
+                <td colSpan={10}>
+                  {orders.length === 0 ? (
+                    <EmptyState
+                      icon={ShoppingBag}
+                      title="No orders yet"
+                      description="Add your first order to start tracking sales and deliveries."
+                      action={
+                        <button
+                          onClick={() => setShowModal(true)}
+                          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition"
+                        >
+                          <Plus size={14} /> Add order
+                        </button>
+                      }
+                    />
+                  ) : (
+                    <EmptyState
+                      icon={Search}
+                      title="No results found"
+                      description={`No orders match "${search}". Try a different name or product.`}
+                    />
+                  )}
                 </td>
               </tr>
             ) : (
