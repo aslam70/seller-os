@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PAYMENT_METHODS } from "../../../lib/constants";
 import { useProducts } from "../../products/hooks/useProducts";
 
@@ -16,8 +16,11 @@ const EMPTY_FORM = {
   notes: "",
 };
 
-export default function AddOrderModal({ show, onClose, onAdd }) {
+export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) {
   const [form, setForm] = useState({ ...EMPTY_FORM });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightIdx, setHighlightIdx] = useState(-1);
+  const inputRef = useRef(null);
   const { products } = useProducts();
 
   useEffect(() => {
@@ -74,21 +77,90 @@ export default function AddOrderModal({ show, onClose, onAdd }) {
           {/* Scrollable form */}
           <div className="overflow-y-auto px-5 sm:px-6 py-4 space-y-4 pb-[env(safe-area-inset-bottom)] sm:pb-4">
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: "Customer Name", key: "customer", span: true },
-                { label: "Phone", key: "phone" },
-              ].map(({ label, key, span }) => (
-                <div key={key} className={span ? "col-span-2" : ""}>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">{label}</label>
-                  <input
-                    type="text"
-                    inputMode={key === "phone" ? "numeric" : "text"}
-                    value={form[key]}
-                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                  />
-                </div>
-              ))}
+              {/* Customer autocomplete */}
+              <div className="col-span-2 relative">
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Customer Name</label>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={form.customer}
+                  onChange={(e) => {
+                    setForm({ ...form, customer: e.target.value });
+                    setShowSuggestions(true);
+                    setHighlightIdx(-1);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                  onKeyDown={(e) => {
+                    const filtered = customers.filter((c) =>
+                      c.name.toLowerCase().includes(form.customer.toLowerCase()),
+                    );
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setHighlightIdx((prev) =>
+                        prev < filtered.length - 1 ? prev + 1 : prev,
+                      );
+                    } else if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setHighlightIdx((prev) => (prev > 0 ? prev - 1 : -1));
+                    } else if (e.key === "Enter" && highlightIdx >= 0) {
+                      e.preventDefault();
+                      const selected = filtered[highlightIdx];
+                      setForm({
+                        ...form,
+                        customer: selected.name,
+                        phone: selected.phone || form.phone,
+                      });
+                      setShowSuggestions(false);
+                    }
+                  }}
+                  placeholder="Search or type a name..."
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                />
+                {showSuggestions && form.customer.length > 0 && (
+                  <div className="absolute z-10 left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                    {customers
+                      .filter((c) =>
+                        c.name.toLowerCase().includes(form.customer.toLowerCase()),
+                      )
+                      .slice(0, 8)
+                      .map((c, i) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onMouseDown={() => {
+                            setForm({
+                              ...form,
+                              customer: c.name,
+                              phone: c.phone || form.phone,
+                            });
+                            setShowSuggestions(false);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 text-sm transition ${
+                            i === highlightIdx
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          <span className="font-medium">{c.name}</span>
+                          {c.phone && (
+                            <span className="text-gray-400 ml-2">{c.phone}</span>
+                          )}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Phone</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                />
+              </div>
 
               {/* Product dropdown */}
               <div className="col-span-2">

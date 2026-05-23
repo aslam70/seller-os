@@ -7,6 +7,7 @@ import OrderDrawer from "./components/OrderDrawer";
 import EmptyState from "../../components/EmptyState";
 import { useOrders } from "./hooks/useOrders";
 import { STATUS_COLORS } from "./ordersConstants";
+import { useCustomers } from "../customers/hooks/useCustomers";
 
 function formatDate(iso) {
   if (!iso) return "—";
@@ -20,6 +21,7 @@ function formatDate(iso) {
 
 export default function OrdersPage() {
   const { orders, loading, addOrder, updateStatus, deleteOrder } = useOrders();
+  const { customers, findOrCreate } = useCustomers();
   const [showModal, setShowModal] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -38,7 +40,13 @@ export default function OrdersPage() {
       o.product.toLowerCase().includes(search.toLowerCase()),
   );
 
-  function handleAdd(formData) {
+  async function handleAdd(formData) {
+    const customerId = await findOrCreate({
+      name: formData.customer,
+      phone: formData.phone,
+      address: formData.address,
+    });
+    if (!customerId) return;
     addOrder(formData);
     setShowModal(false);
   }
@@ -191,6 +199,7 @@ export default function OrdersPage() {
         show={showModal}
         onClose={() => setShowModal(false)}
         onAdd={handleAdd}
+        customers={customers}
       />
 
       <OrderDrawer
