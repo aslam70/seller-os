@@ -121,5 +121,38 @@ export function useOrders() {
     }
   };
 
-  return { orders, loading, error, addOrder, updateStatus, deleteOrder };
+  const bulkAddOrders = async (rows) => {
+    try {
+      const dbRows = rows.map((row) => ({
+        customer: row.customer,
+        phone: row.phone || "",
+        address: row.address || "",
+        product: row.product,
+        amount: Number(row.amount) || 0,
+        delivery_charge: Number(row.deliveryCharge) || 60,
+        payment: row.payment || "COD",
+        status: row.status || ORDER_STATUS.PENDING,
+        courier: row.courier || "Pathao",
+        notes: row.notes || "",
+        user_id: user.id,
+      }));
+
+      const { data, error } = await supabase
+        .from("orders")
+        .insert(dbRows)
+        .select();
+
+      if (error) throw error;
+
+      setOrders((prev) => [...(data || []).map(mapRow), ...prev]);
+      toast.success(`${data.length} orders imported!`);
+      return true;
+    } catch (err) {
+      toast.error("Failed to import orders");
+      console.error(err);
+      return false;
+    }
+  };
+
+  return { orders, loading, error, addOrder, bulkAddOrders, updateStatus, deleteOrder };
 }
