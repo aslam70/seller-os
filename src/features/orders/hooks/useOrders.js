@@ -67,6 +67,8 @@ export function useOrders() {
         courier: formData.courier || "Pathao",
         notes: formData.notes || "",
         user_id: user.id,
+        // Generate a short random display ID for UI purposes
+        display_id: Math.random().toString(36).substring(2, 8).toUpperCase(),
       };
 
       const { data, error } = await supabase
@@ -114,7 +116,7 @@ export function useOrders() {
       if (error) throw error;
 
       setOrders((prev) => prev.filter((o) => o.id !== id));
-      toast.error("Order deleted");
+      toast.success("Order deleted");
     } catch (err) {
       toast.error("Failed to delete order");
       console.error(err);

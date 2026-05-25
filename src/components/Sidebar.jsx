@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag, Package, LogOut, Settings } from "lucide-react";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import { useSubscription } from "../features/subscription/hooks/useSubscription";
+import { useOrders } from "../features/orders/hooks/useOrders";
 
 const links = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -35,7 +36,8 @@ export default function Sidebar({ open, onClose }) {
 function Inner({ onClose }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { plan } = useSubscription();
+  const { orders } = useOrders();
+  const { plan } = useSubscription(orders.length);
 
   const handleLogout = async () => {
     await signOut();
