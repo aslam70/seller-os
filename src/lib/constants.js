@@ -19,8 +19,8 @@ export const RISK_LEVELS = {
 };
 
 export const RISK_BADGE_CONFIG = {
-  trusted: { label: "Trusted", icon: "ShieldCheck", color: "emerald" },
-  medium: { label: "Medium Risk", icon: "ShieldAlert", color: "yellow" },
-  high: { label: "High Risk", icon: "Shield", color: "red" },
-  new_customer: { label: "New Customer", icon: "UserPlus", color: "gray" },
+  trusted: { label: "Trusted", icon: "ShieldCheck", colorClass: "text-emerald-600" },
+  medium: { label: "Medium Risk", icon: "ShieldAlert", colorClass: "text-yellow-600" },
+  high: { label: "High Risk", icon: "Shield", colorClass: "text-red-600" },
+  new_customer: { label: "New Customer", icon: "UserPlus", colorClass: "text-gray-500" },
 };

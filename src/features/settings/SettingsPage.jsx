@@ -12,6 +12,7 @@ import {
   Loader2,
   Lock,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -31,6 +32,10 @@ export default function SettingsPage() {
   const [shopSettings, setShopSettings] = useState({ ...DEFAULT_SETTINGS });
   const [savingSettings, setSavingSettings] = useState(false);
 
+  // Blacklist state
+  const [blacklist, setBlacklist] = useState([]);
+  const [blacklistInput, setBlacklistInput] = useState("");
+
   // Upgrade simulator state
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [simulatedPaymentMethod, setSimulatedPaymentMethod] = useState("bKash");
@@ -41,6 +46,13 @@ export default function SettingsPage() {
   const [supportInput, setSupportInput] = useState("");
   const [agentTyping, setAgentTyping] = useState(false);
 
+  // Save blacklist to localStorage whenever it changes
+  useEffect(() => {
+    if (!user) return;
+    const blKey = `seller_os_blacklist_${user.id}`;
+    localStorage.setItem(blKey, JSON.stringify(blacklist));
+  }, [blacklist, user]);
+
   // Load shop settings
   useEffect(() => {
     if (!user) return;
@@ -48,6 +60,14 @@ export default function SettingsPage() {
     const saved = localStorage.getItem(key);
     if (saved) {
       setShopSettings(JSON.parse(saved));
+    }
+    // Load blacklist
+    const blKey = `seller_os_blacklist_${user.id}`;
+    const blSaved = localStorage.getItem(blKey);
+    if (blSaved) {
+      try {
+        setBlacklist(JSON.parse(blSaved));
+      } catch {}
     }
   }, [user]);
 
@@ -213,6 +233,45 @@ export default function SettingsPage() {
             </button>
           </div>
         </form>
+
+{/* Blacklist Section */}
+{user && (
+  <section className="mt-8">
+    <h2 className="text-sm font-bold text-gray-800 border-b border-gray-50 pb-2">Phone Blacklist</h2>
+    <p className="text-xs text-gray-500 mb-2">Add phone numbers to mark as high‑risk customers.</p>
+    <div className="flex items-center gap-2 mb-4">
+      <input
+        type="text"
+        placeholder="Phone number (01xxxxxxxxx)"
+        value={blacklistInput}
+        onChange={(e) => setBlacklistInput(e.target.value)}
+        className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+      />
+      <button
+        type="button"
+        onClick={addToBlacklist}
+        className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-3 py-1 text-sm font-bold"
+      >
+        Add
+      </button>
+    </div>
+    <ul className="space-y-1">
+      {blacklist.map((phone) => (
+        <li key={phone} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
+          <span className="text-sm text-gray-800">{phone}</span>
+          <button
+            type="button"
+            onClick={() => removeFromBlacklist(phone)}
+            className="text-gray-400 hover:text-red-600 transition"
+            title="Remove"
+          >
+            <Trash2 size={14} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
       )}
 
       {activeTab === "billing" && (

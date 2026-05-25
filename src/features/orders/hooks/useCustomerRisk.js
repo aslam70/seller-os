@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabase";
+import { useAuth } from "../../auth/hooks/useAuth";
 
 /**
  * useCustomerRisk – calculates risk metrics for a given phone number.
@@ -28,6 +29,15 @@ export function useCustomerRisk(phone, currentId) {
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Check blacklist
+        const saved = localStorage.getItem(`seller_os_blacklist_${user?.id}`);
+        const blacklist = saved ? JSON.parse(saved) : [];
+        if (blacklist.includes(phone)) {
+          setRiskLevel('high');
+          setReturnRate(0);
+          setLoading(false);
+          return;
+        }
         // Build base query for orders matching the phone number.
         let query = supabase.from("orders").select("status").eq("phone", phone);
         // Exclude the currently viewed order, if provided.
@@ -76,5 +86,5 @@ export function useCustomerRisk(phone, currentId) {
     fetchData();
   }, [phone, currentId]);
 
-  return { loading, totalOrders, delivered, returned, returnRate, riskLevel };
+  return { loading, totalOrders, delivered, returned, returnRate, riskLevel, blacklistChecked: true };
 }

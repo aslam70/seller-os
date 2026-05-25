@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { PAYMENT_METHODS } from "../../../lib/constants";
 import { useProducts } from "../../products/hooks/useProducts";
 import { useAuth } from "../../auth/hooks/useAuth";
-import { MapPin, Search } from "lucide-react";
+import { MapPin, Search, Shield } from "lucide-react";
 
 const COURIERS = ["Pathao", "Steadfast", "Redx", "Others"];
 

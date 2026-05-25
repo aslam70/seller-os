@@ -89,7 +89,7 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
                 </p>
                 <p className="text-sm">Return Rate: {returnRate.toFixed(1)}%</p>
 {riskLevel && (
-  <div className={`flex items-center space-x-1 text-${RISK_BADGE_CONFIG[riskLevel].color}-600`}>
+  <div className={`flex items-center space-x-1 ${RISK_BADGE_CONFIG[riskLevel].colorClass}`}>
     {(() => {
       const IconMap = {
         trusted: ShieldCheck,
