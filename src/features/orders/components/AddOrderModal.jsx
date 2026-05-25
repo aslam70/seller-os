@@ -232,14 +232,13 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 />
               </div>
-
-              {/* Amount */}
               {phoneRiskLevel === 'high' && (
-                 <div className="flex items-center gap-2 bg-red-100 text-red-800 p-2 rounded-md mt-2">
-                   <Shield className="w-4 h-4" />
-                   <span>High risk phone number detected. Please verify before proceeding.</span>
-                 </div>
-               )}
+                <div className="col-span-2 flex items-center gap-2 bg-red-100 text-red-800 p-2 rounded-md">
+                  <Shield className="w-4 h-4" />
+                  <span>High risk phone number detected. Please verify before proceeding.</span>
+                </div>
+              )}
+              {/* Amount */}
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Price / Amount (৳)</label>
                 <input
