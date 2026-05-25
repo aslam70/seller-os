@@ -3,12 +3,14 @@ import { supabase } from "../../../lib/supabase";
 
 /**
  * useCustomerRisk – calculates risk metrics for a given phone number.
+ * Excludes the current order (by id) from the aggregation.
  * Returns loading state, computed metrics, and a human‑readable risk level.
  *
- * @param {string|null|undefined} phone – phone number from the order.
+ * @param {string|null|undefined} phone – phone number associated with the order.
+ * @param {string|undefined} currentId – optional ID of the current order to exclude from calculations.
  * @returns {{ loading: boolean, totalOrders: number, delivered: number, returned: number, returnRate: number, riskLevel: string }}
  */
-export function useCustomerRisk(phone) {
+export function useCustomerRisk(phone, currentId) {
   const [loading, setLoading] = useState(false);
   const [totalOrders, setTotalOrders] = useState(0);
   const [delivered, setDelivered] = useState(0);
@@ -26,10 +28,13 @@ export function useCustomerRisk(phone) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("orders")
-          .select("status")
-          .eq("phone", phone);
+        // Build base query for orders matching the phone number.
+        let query = supabase.from("orders").select("status").eq("phone", phone);
+        // Exclude the currently viewed order, if provided.
+        if (currentId) {
+          query = query.neq("id", currentId);
+        }
+        const { data, error } = await query;
 
         if (error) {
           console.error("Failed to fetch orders for risk scoring", error);
@@ -40,25 +45,27 @@ export function useCustomerRisk(phone) {
         const total = data?.length ?? 0;
         const deliveredCnt = data?.filter((o) => o.status === "delivered").length ?? 0;
         const returnedCnt = data?.filter((o) => o.status === "returned").length ?? 0;
-        const rate = total > 0 ? (returnedCnt / total) * 100 : 0;
+        // Only consider completed orders (delivered or returned) for the denominator.
+        const denominator = deliveredCnt + returnedCnt;
+        const rate = denominator > 0 ? (returnedCnt / denominator) * 100 : 0;
 
         setTotalOrders(total);
         setDelivered(deliveredCnt);
         setReturned(returnedCnt);
         setReturnRate(rate);
 
-        // Determine risk level
-        let level = "";
-        if (total === 1) {
-          level = "New Customer";
+        // Determine risk level key based on constants.
+        let levelKey = "";
+        if (total === 0) {
+          levelKey = "new_customer"; // No previous orders.
         } else if (rate >= 40) {
-          level = "High Risk";
+          levelKey = "high";
         } else if (rate >= 20) {
-          level = "Medium Risk";
+          levelKey = "medium";
         } else {
-          level = "Trusted";
+          levelKey = "trusted";
         }
-        setRiskLevel(level);
+        setRiskLevel(levelKey);
       } catch (e) {
         console.error(e);
       } finally {
@@ -67,7 +74,7 @@ export function useCustomerRisk(phone) {
     };
 
     fetchData();
-  }, [phone]);
+  }, [phone, currentId]);
 
   return { loading, totalOrders, delivered, returned, returnRate, riskLevel };
 }

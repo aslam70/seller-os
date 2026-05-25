@@ -1,5 +1,5 @@
-import { X, Trash2 } from "lucide-react";
-import { ORDER_STATUS } from "../../../lib/constants";
+import { X, Trash2, Loader2, ShieldCheck, ShieldAlert, Shield, UserPlus } from "lucide-react";
+import { ORDER_STATUS, RISK_BADGE_CONFIG } from "../../../lib/constants";
 import { useSubscription } from "../../../features/subscription/hooks/useSubscription";
 import { useSteadfast } from "../../../features/steadfast/useSteadfast";
 import { useCustomerRisk } from "../../../features/orders/hooks/useCustomerRisk";
@@ -35,7 +35,38 @@ function formatDate(iso) {
 export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }) {
   const { tier } = useSubscription();
   const { createConsignment } = useSteadfast();
-  const { loading: riskLoading, totalOrders, delivered, returned, returnRate, riskLevel } = useCustomerRisk(order?.phone);
+    const { loading: riskLoading, totalOrders, delivered, returned, returnRate, riskLevel } = useCustomerRisk(order?.phone, order?.id);
+
+            {/* Customer History */}
+            {!riskLoading && (
+              <section className="mt-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Customer History
+                </p>
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm">
+                    📦 {totalOrders} orders  ✅ {delivered} delivered  ❌ {returned} returned
+                  </p>
+                  <p className="text-sm">Return Rate: {returnRate.toFixed(1)}%</p>
+                  {riskLevel && (
+                    <div className={`flex items-center space-x-1 text-${RISK_BADGE_CONFIG[riskLevel].color}-600`}> 
+                      {(() => {
+                        const IconMap = {
+                          trusted: ShieldCheck,
+                          medium: ShieldAlert,
+                          high: Shield,
+                          new_customer: UserPlus,
+                        };
+                        const Icon = IconMap[riskLevel];
+                        return Icon ? <Icon size={16} /> : null;
+                      })()}
+                      <span>{RISK_BADGE_CONFIG[riskLevel].label}</span>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+            {riskLoading && <div className="animate-pulse h-6 bg-gray-200 rounded w-48 mb-2" />}
   if (!order) return null;
 
 
