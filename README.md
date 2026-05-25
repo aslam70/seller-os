@@ -1,113 +1,106 @@
-# SellerOS – Real‑World SaaS Demo
+# Seller OS — Premium Multi-Tenant Social Commerce SaaS
 
-## Overview
-SellerOS is a small but **feature‑rich SaaS‑style** web application that lets you manage **orders, products, customers, and dashboards**. The project demonstrates:
-- **Premium‑tier gating** (Free / Grower / Enterprise) backed by Supabase profiles.
-- **Glass‑morphic paywalls** that visually block premium features.
-- **Mock payment flow** that safely simulates a bKash transaction without collecting real credentials.
-- **Tailwind‑only UI** (no DaisyUI) with vibrant colors and micro‑animations.
-- **Real‑time data** fetched from Supabase.
+Seller OS is an enterprise-grade Software-as-a-Service (SaaS) operational control deck and analytics platform designed specifically for Bangladeshi social commerce (F-commerce) merchants selling on Facebook, Instagram, and TikTok. 
 
-The codebase is built with **Vite + React** and uses **Tailwind CSS** for styling.
+It streamlines manual order entries, tracks shipments, aggregates courier metrics, analyzes cash-on-delivery (COD) return risks, and automates customer communications via WhatsApp.
+
+**Live Production Url:** [https://seller-os-khaki.vercel.app](https://seller-os-khaki.vercel.app)
 
 ---
 
-## Tech Stack
-- **Framework**: Vite + React 18
-- **Styling**: Tailwind CSS (pure utilities, custom glass‑morphism)
-- **Database / Auth**: Supabase (PostgreSQL, RLS policies, auth)
-- **State management**: React hooks (`useOrders`, `useSubscription`, etc.)
-- **Notifications**: `react-hot-toast`
-- **Icons**: `lucide-react`
-- **Deployment**: Any static host (Netlify, Vercel) – just run `npm run build` and serve the `dist` folder.
+## ✨ Premium SaaS Features
+
+### 1. Interactive Business Analytics Dashboard
+- **SVG Sales Trend Line Chart:** A gorgeous, responsive trend graph mapping sales revenue and order counts over 7 days, complete with interactive hover tooltips.
+- **Return Risk Gauge:** A circular progress radial meter showing return rates (critical for local COD) with automated trust rating classification flags (Trusted, Medium, High Risk).
+- **Courier Performance Benchmarks:** Dynamic rankings analyzing delivery success rates across major couriers (Pathao, Steadfast, Redx) to help sellers minimize returns.
+- **Payment Share breakdown:** A segmented visual share bar mapping billing splits (COD, bKash, Nagad, Card).
+
+### 2. CSV Bulk Importer & Data Exporter
+- **Custom RFC-4180 CSV Parser:** A robust custom JavaScript parser that handles commas, quoted values, double-quotes escaping, and line breaks without relying on heavy libraries.
+- **Visual Validation Grid:** An interactive preview spreadsheet validating parsed rows and highlighting missing fields before importing.
+- **Automated Directory Sync:** Automatically registers new products and customer entries in the background during bulk imports to maintain database integrity.
+- **Filtered Exporter:** Allows instant download of filtered orders as a clean, standardized CSV file.
+
+### 3. Buttery Smooth Kanban Board
+- Built on top of `@dnd-kit/core` and `@dnd-kit/sortable`.
+- Implements **Optimistic UI Updates** locally to visual columns for buttery smooth drag-and-drop feedback.
+- Restricts database API requests by checking card column modifications and triggering a single Supabase write **only on DragEnd**, saving massive server costs.
+
+### 4. Smart manual Sales Registration Modal
+- **Customer Autocomplete:** As you type, searches for existing customers to auto-populate phone numbers and delivery addresses.
+- **Product Autocomplete:** Searches and selects products from the catalog, auto-filling price and catalog metadata.
+- **Delivery Zone Toggles:** Quick switch between Inside Dhaka and Outside Dhaka. Automatically and dynamically pulls the seller's **custom shop delivery fee defaults** configured in their Control Center, falling back to standard rates (৳60 / ৳120) if unset.
+
+### 5. Advanced Customer Profiles, Risk Scoring & WhatsApp Quick Actions
+- **Dynamic Customer Risk Scoring (`useCustomerRisk`):** Analyzes historical orders for any customer by phone number to calculate lifetime orders, successful deliveries, returns, and return rates.
+  - Automatically filters out the current active order to prevent evaluation bias.
+  - Dynamically classifies customers into granular risk tiers: `Trusted` (Return Rate < 20%), `Medium Risk` (20% - 40%), `High Risk` (>= 40%), or `New Customer` (0 previous orders).
+  - Renders visual shield badges (`ShieldCheck`, `ShieldAlert`, `Shield`, `UserPlus`) and custom color-coded indicators based on risk severity directly in the **Order Drawer**.
+- **Comprehensive Profiles:** Compiles customer lifetime value, successful deliveries, returns count, and order histories.
+- **F-Commerce Transactional Drafts:** Automatically generates pre-formatted messages (Order Confirmed, Shipped, Returned) with live order data.
+- **WhatsApp & SMS Redirects:** One-click redirect links (`wa.me/880...`) that launch WhatsApp or SMS with pre-filled messages for instant tracking alerts.
+
+### 6. Shop Configuration Settings
+- Sellers can customize their Shop Name, helpline, and **custom Inside/Outside Dhaka delivery defaults**, which dynamically override the order registration defaults.
+
+### 7. Multi-tier Subscriptions & Quota Paywalls
+- Persistent, user-isolated subscription plans:
+  - **Free Plan:** Limit of 15 orders. CSV bulk importing/exporting is locked.
+  - **Grower Plan (৳499/mo):** Limit of 250 orders, unlocks SVG analytics, CSV tools, and WhatsApp template boards.
+  - **Enterprise Plan (৳1,499/mo):** Unlimited orders, customers, and priority dedicated support.
+- Displays dynamic subscription status badges in the sidebar.
+- **Checkout upgrade simulator:** A beautiful glassmorphic modal mimicking a mobile banking portal (bKash/Nagad/Rocket) to simulate upgrading plans and instantly unlocking quotas.
 
 ---
 
-## Getting Started (Local Development)
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/your-username/seller-os.git
-   cd seller-os
-   ```
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-3. **Set up Supabase**
-   - Create a new project at https://app.supabase.com.
-   - In the project's **SQL editor**, run the migration file `00004_create_profiles_table.sql`:
-     ```sql
-     create table public.profiles (
-       id uuid primary key,
-       tier text not null default 'free',
-       updated_at timestamptz default now()
-     );
-     ```
-   - Enable **RLS** and add a policy that allows a user to **read & upsert** their own profile.
-   - Copy the **anon public key** and **API URL** from Supabase settings.
-4. **Create a `.env` file** in the project root:
-   ```env
-   VITE_SUPABASE_URL=<your-supabase-url>
-   VITE_SUPABASE_ANON_KEY=<your-anon-key>
-   ```
-5. **Run the dev server**
-   ```bash
-   npm run dev
-   ```
-   The app will be available at `http://localhost:5175` (Vite picks the next free port).
+## 🔒 Multi-Tenant Database Security (RLS)
+
+Seller OS enforces absolute customer data isolation. Row Level Security (RLS) policies are active across all database tables in Supabase:
+- **Tables:** `orders`, `products`, `customers`.
+- **Policy Rules:** Every operational transaction (Insert, Select, Update, Delete) is strictly validated against `auth.uid() = user_id`. Sellers can **only** access and modify their own store data.
 
 ---
 
-## Key Features
-- **Subscription Management** (`useSubscription`): reads the tier from Supabase `profiles` table and updates it securely via an upsert.
-- **Paywall Modal** (`SaaSUpgradeModal.jsx`): shows a single **“Simulate Payment”** button – no PIN field, eliminating any credential‑harvesting risk.
-- **Order UI** (`useOrders`): generates a short `display_id` (`Math.random().toString(36).substring(2,8).toUpperCase()`) for each order.
-- **Tailwind‑only Buttons** on the Products page – DaisyUI removed.
-- **Loading State** handling on Kanban page with a simple spinner.
-- **Sidebar** now passes `orders.length` to `useSubscription` so `reachedLimit` works correctly.
-- **Toast messages**: success vs. error are used appropriately (e.g., order deletion now shows `toast.success`).
+## 🛠️ Technology Stack
+- **Framework:** React 19 (SPA) + Vite 8
+- **Styling:** Tailwind CSS v4 + Vanilla HSL styling utilities
+- **Backend/Database:** Supabase (PostgreSQL with RLS)
+- **Icons:** Lucide React
+- **Drag-and-Drop:** `@dnd-kit/core` + `@dnd-kit/sortable`
+- **Notifications:** React Hot Toast
 
 ---
 
-## Project Structure (high‑level)
+## 🚀 Local Run Guidelines
+
+### 1. Prerequisites
+- Node.js (v18+)
+- npm
+
+### 2. Installation
+Clone the repository and install dependencies:
+```bash
+npm install
 ```
-src/
-├─ components/          # UI primitives (Sidebar, SaaSUpgradeModal, etc.)
-├─ features/
-│   ├─ auth/            # Supabase auth hook
-│   ├─ orders/          # useOrders hook + pages
-│   ├─ customers/       # Customer panel
-│   ├─ products/        # Products page & hook
-│   ├─ dashboard/       # Dashboard page with premium overlays
-│   ├─ settings/        # Settings/Control Center page
-│   └─ subscription/    # useSubscription hook & plan constants
-├─ lib/                 # Supabase client, constants
-└─ App.jsx              # Routes & layout
+
+### 3. Environment Variables Configuration
+Create a `.env` file in the root directory:
+```env
+VITE_SUPABASE_URL=your-supabase-project-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
----
+### 4. Running Dev Server
+Launch the local dev environment:
+```bash
+npm run dev
+```
+Open **[http://localhost:5173/](http://localhost:5173/)** in your browser.
 
-## Deployment Checklist
-- ✅ Ensure `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set in the hosting environment.
-- ✅ Run `npm run build` and upload the generated `dist/` folder.
-- ✅ Verify that the **profiles** table exists and RLS policies are active.
-- ✅ Test the upgrade flow: open the modal, click **“Simulate Payment”**, and confirm the tier changes in the sidebar.
-
----
-
-## Known Limitations & Future Work
-| Area | Limitation | Suggested improvement |
-|------|------------|------------------------|
-| `display_id` generation | Simple random string may collide at very high scale | Switch to `nanoid` or UUID‑based IDs when scaling. |
-| Loading UI | Basic spinner on Kanban page; could be replaced with a polished skeleton UI. |
-| Tests | No unit / integration tests yet – add Jest + React Testing Library. |
-| Documentation | README now covers basics; consider adding a **contributing guide** and **API reference**. |
-
----
-
-## License
-This project is provided under the MIT License – feel free to fork, modify, and deploy.
-
----
-
-*Happy hacking! 🎉*
+### 5. Production Compilation
+Compile the project for deployment:
+```bash
+npm run build
+```
+This generates a highly optimized production bundle inside the `/dist` directory.

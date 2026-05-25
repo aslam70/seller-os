@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { PAYMENT_METHODS } from "../../../lib/constants";
 import { useProducts } from "../../products/hooks/useProducts";
+import { useAuth } from "../../auth/hooks/useAuth";
 import { MapPin, Search } from "lucide-react";
 
 const COURIERS = ["Pathao", "Steadfast", "Redx", "Others"];
@@ -18,6 +19,7 @@ const EMPTY_FORM = {
 };
 
 export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) {
+  const { user } = useAuth();
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
@@ -25,19 +27,40 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
   const inputRef = useRef(null);
   const { products } = useProducts();
 
+  // Load custom shop settings defaults
+  const getDeliveryFees = () => {
+    let insideFee = "60";
+    let outsideFee = "120";
+    if (user) {
+      const saved = localStorage.getItem(`seller_os_settings_${user.id}`);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        insideFee = parsed.insideDhakaFee || "60";
+        outsideFee = parsed.outsideDhakaFee || "120";
+      }
+    }
+    return { insideFee, outsideFee };
+  };
+
   useEffect(() => {
     if (show) {
-      setForm({ ...EMPTY_FORM });
+      const { insideFee } = getDeliveryFees();
+      setForm({
+        ...EMPTY_FORM,
+        deliveryCharge: insideFee,
+        courier: "Pathao",
+      });
       setLocationTab("inside");
     }
-  }, [show]);
+  }, [show, user]);
 
   // Adjust courier & delivery charge on location tab toggle
   const handleLocationToggle = (loc) => {
     setLocationTab(loc);
+    const { insideFee, outsideFee } = getDeliveryFees();
     setForm((prev) => ({
       ...prev,
-      deliveryCharge: loc === "inside" ? "60" : "120",
+      deliveryCharge: loc === "inside" ? insideFee : outsideFee,
       courier: loc === "inside" ? "Pathao" : "Steadfast",
     }));
   };
