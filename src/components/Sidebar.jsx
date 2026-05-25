@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag, Package, LogOut } from "lucide-react";
+import { X, LayoutDashboard, ClipboardList, Kanban, Users, ShoppingBag, Package, LogOut, Settings } from "lucide-react";
 import { useAuth } from "../features/auth/hooks/useAuth";
+import { useSubscription } from "../features/subscription/hooks/useSubscription";
 
 const links = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -8,6 +9,7 @@ const links = [
   { to: "/kanban", label: "Kanban", icon: Kanban },
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/products", label: "Products", icon: Package },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export default function Sidebar({ open, onClose }) {
@@ -33,6 +35,7 @@ export default function Sidebar({ open, onClose }) {
 function Inner({ onClose }) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { plan } = useSubscription();
 
   const handleLogout = async () => {
     await signOut();
@@ -81,7 +84,7 @@ function Inner({ onClose }) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-gray-700 truncate">{user?.email}</p>
-            <p className="text-xs text-gray-400">Free Plan</p>
+            <p className="text-xs text-gray-400 font-medium">{plan?.name || "Free Plan"}</p>
           </div>
         </div>
         <button

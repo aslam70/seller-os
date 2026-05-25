@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, ShoppingBag, Download, Upload } from "lucide-react";
+import { Plus, Search, ShoppingBag, Download, Upload, AlertTriangle, Lock } from "lucide-react";
 import { ORDER_STATUS } from "../../lib/constants";
 import OrderRow from "./components/OrderRow";
 import AddOrderModal from "./components/AddOrderModal";
@@ -9,6 +9,8 @@ import EmptyState from "../../components/EmptyState";
 import { useOrders } from "./hooks/useOrders";
 import { STATUS_COLORS } from "./ordersConstants";
 import { useCustomers } from "../customers/hooks/useCustomers";
+import { useSubscription } from "../subscription/hooks/useSubscription";
+import SaaSUpgradeModal from "../../components/SaaSUpgradeModal";
 import toast from "react-hot-toast";
 
 function formatDate(iso) {
@@ -24,10 +26,16 @@ function formatDate(iso) {
 export default function OrdersPage() {
   const { orders, loading, addOrder, bulkAddOrders, updateStatus, deleteOrder } = useOrders();
   const { customers, findOrCreate } = useCustomers();
+  const { tier, plan, reachedLimit } = useSubscription(orders.length);
+
   const [showModal, setShowModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // SaaS Paywall State
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paywallTitle, setPaywallTitle] = useState("Upgrade Plan");
 
   if (loading) {
     return (
@@ -97,8 +105,63 @@ export default function OrdersPage() {
     document.body.removeChild(link);
   };
 
+  // Interceptors for Premium SaaS actions
+  const handleAddOrderClick = () => {
+    if (reachedLimit) {
+      setPaywallTitle("Order Quota Limit Reached");
+      setPaywallOpen(true);
+    } else {
+      setShowModal(true);
+    }
+  };
+
+  const handleImportCSVClick = () => {
+    if (tier === "free") {
+      setPaywallTitle("CSV Automation is a Premium Feature");
+      setPaywallOpen(true);
+    } else {
+      setShowImportModal(true);
+    }
+  };
+
+  const handleExportCSVClick = () => {
+    if (tier === "free") {
+      setPaywallTitle("CSV Automation is a Premium Feature");
+      setPaywallOpen(true);
+    } else {
+      handleExportCSV();
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      
+      {/* SaaS Quota Warning Banner */}
+      {tier === "free" && (
+        <div className="glass-panel border-amber-200 bg-amber-50/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in shadow-xs">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
+              <AlertTriangle size={15} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-amber-900">You are on the Free Plan ({orders.length} / 15 Orders Used)</p>
+              <p className="text-[10px] text-amber-700/80 mt-0.5 font-medium leading-normal">
+                Upgrade to Grower Plan to activate bulk CSV importing/exporting, unlock SVG charts, and extend your limits to 250 orders.
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => {
+              setPaywallTitle("Upgrade to Grower Plan");
+              setPaywallOpen(true);
+            }}
+            className="text-xs px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl transition-all shadow-xs cursor-pointer shrink-0"
+          >
+            Upgrade Now
+          </button>
+        </div>
+      )}
+
       {/* Header with quick buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -109,22 +172,22 @@ export default function OrdersPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={handleExportCSV}
+            onClick={handleExportCSVClick}
             className="flex items-center justify-center gap-1.5 bg-white border border-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-xs font-bold shadow-xs hover:bg-gray-50 transition cursor-pointer"
           >
-            <Download size={14} /> Export CSV
+            <Download size={14} /> Export CSV {tier === "free" && <Lock size={10} className="text-amber-500" />}
           </button>
           <button
-            onClick={() => setShowImportModal(true)}
+            onClick={handleImportCSVClick}
             className="flex items-center justify-center gap-1.5 bg-white border border-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-xs font-bold shadow-xs hover:bg-gray-50 transition cursor-pointer"
           >
-            <Upload size={14} /> Import CSV
+            <Upload size={14} /> Import CSV {tier === "free" && <Lock size={10} className="text-amber-500" />}
           </button>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={handleAddOrderClick}
             className="flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold shadow-xs hover:shadow-md transition cursor-pointer"
           >
-            <Plus size={14} /> Add Order
+            <Plus size={14} /> Add Order {reachedLimit && <Lock size={10} className="text-white" />}
           </button>
         </div>
       </div>
@@ -153,8 +216,8 @@ export default function OrdersPage() {
               description="Add your first order to start tracking sales and deliveries."
               action={
                 <button
-                  onClick={() => setShowModal(true)}
-                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition"
+                  onClick={handleAddOrderClick}
+                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer"
                 >
                   <Plus size={14} /> Add order
                 </button>
@@ -223,8 +286,8 @@ export default function OrdersPage() {
                       description="Add your first order to start tracking sales and deliveries."
                       action={
                         <button
-                          onClick={() => setShowModal(true)}
-                          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition"
+                          onClick={handleAddOrderClick}
+                          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition cursor-pointer"
                         >
                           <Plus size={14} /> Add order
                         </button>
@@ -278,6 +341,13 @@ export default function OrdersPage() {
           deleteOrder(id);
           setSelectedOrder(null);
         }}
+      />
+
+      {/* Reusable SaaS Paywall Modal */}
+      <SaaSUpgradeModal 
+        show={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        title={paywallTitle}
       />
     </div>
   );

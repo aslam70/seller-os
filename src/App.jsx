@@ -5,6 +5,7 @@ import OrdersPage from "./features/orders/OrdersPage";
 import KanbanPage from "./features/kanban/KanbanPage";
 import CustomersPage from "./features/customers/CustomersPage";
 import ProductsPage from "./features/products/ProductsPage";
+import SettingsPage from "./features/settings/SettingsPage";
 import LoginPage from "./features/auth/LoginPage";
 import SignupPage from "./features/auth/SignupPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/kanban" element={<KanbanPage />} />
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/products" element={<ProductsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   );

@@ -10,10 +10,13 @@ import {
   Truck,
   CreditCard,
   Percent,
+  Lock,
 } from "lucide-react";
 import { ORDER_STATUS } from "../../lib/constants";
 import { getDeliveredRevenue } from "../../lib/selectors";
 import { useOrders } from "../orders/hooks/useOrders";
+import { useSubscription } from "../subscription/hooks/useSubscription";
+import SaaSUpgradeModal from "../../components/SaaSUpgradeModal";
 
 const STAT_CONFIG = [
   {
@@ -57,7 +60,12 @@ const STAT_CONFIG = [
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { orders, loading } = useOrders();
+  const { tier } = useSubscription(orders.length);
   const [hoveredPoint, setHoveredPoint] = useState(null);
+
+  // Paywall Modal State
+  const [paywallOpen, setPaywallOpen] = useState(false);
+  const [paywallTitle, setPaywallTitle] = useState("Upgrade Plan");
 
   const counts = useMemo(() => {
     return {
@@ -261,8 +269,9 @@ export default function DashboardPage() {
 
       {/* Visual Analytics Block */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
         {/* Trend Line Graph */}
-        <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between min-h-[320px]">
+        <div className="relative overflow-hidden lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between min-h-[320px]">
           <div>
             <div className="flex items-center justify-between mb-1">
               <h3 className="text-sm font-bold text-gray-800">Delivered Revenue Trend</h3>
@@ -348,10 +357,32 @@ export default function DashboardPage() {
               <span key={i}>{d.label}</span>
             ))}
           </div>
+
+          {/* Premium Gating Blur Overlay */}
+          {tier === "free" && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-6">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700 mb-3 shadow-2xs">
+                <Lock size={16} />
+              </div>
+              <p className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1">Delivered Revenue Trend</p>
+              <p className="text-[10px] text-gray-500 max-w-xs mb-4 leading-normal font-medium">
+                Visual sales SVG plotting & revenue analytics are Grower tier benefits. Upgrade to trace transaction history.
+              </p>
+              <button
+                onClick={() => {
+                  setPaywallTitle("Unlock Advanced Analytics");
+                  setPaywallOpen(true);
+                }}
+                className="text-[10px] font-black px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs transition cursor-pointer"
+              >
+                Unlock Grower Analytics
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Circular Return Rate Gauge */}
-        <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between items-center text-center">
+        <div className="relative overflow-hidden bg-white border border-gray-100 rounded-2xl p-5 shadow-xs flex flex-col justify-between items-center text-center">
           <div className="w-full text-left">
             <h3 className="text-sm font-bold text-gray-800">Returned Risk Gauge</h3>
             <p className="text-xs text-gray-400 mt-0.5">Percentage of non-delivered returns</p>
@@ -408,6 +439,28 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+
+          {/* Premium Gating Blur Overlay */}
+          {tier === "free" && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-6">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700 mb-3 shadow-2xs">
+                <Lock size={16} />
+              </div>
+              <p className="text-xs font-black text-gray-800 uppercase tracking-wider mb-1">Returned Risk Gauge</p>
+              <p className="text-[10px] text-gray-500 max-w-xs mb-4 leading-normal font-medium">
+                Return rate analytical gauges and deliverability risk models require a Grower Plan upgrade.
+              </p>
+              <button
+                onClick={() => {
+                  setPaywallTitle("Unlock Advanced Analytics");
+                  setPaywallOpen(true);
+                }}
+                className="text-[10px] font-black px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs transition cursor-pointer"
+              >
+                Unlock Grower Analytics
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -512,6 +565,13 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* SaaS Paywall Upgrade Modal */}
+      <SaaSUpgradeModal 
+        show={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        title={paywallTitle}
+      />
     </div>
   );
 }

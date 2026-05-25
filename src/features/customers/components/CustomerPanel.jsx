@@ -11,13 +11,19 @@ import {
   MapPin,
   Clock,
   ExternalLink,
+  Lock,
 } from "lucide-react";
 import { STATUS_COLORS } from "../../orders/ordersConstants";
 import { riskLevel, customerSpent, RISK_CONFIG } from "../hooks/useCustomers";
+import { useSubscription } from "../../subscription/hooks/useSubscription";
+import SaaSUpgradeModal from "../../../components/SaaSUpgradeModal";
 import toast from "react-hot-toast";
 
 export default function CustomerPanel({ customer }) {
   const [activeTab, setActiveTab] = useState("whatsapp");
+  const { tier } = useSubscription();
+  const [paywallOpen, setPaywallOpen] = useState(false);
+
   const risk = riskLevel(customer.orders);
   const spent = customerSpent(customer.orders);
   const returns = customer.orders.filter((o) => o.status === "returned").length;
@@ -158,7 +164,7 @@ export default function CustomerPanel({ customer }) {
 
         {/* WhatsApp & SMS communications panel */}
         {latestOrder ? (
-          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 space-y-4">
+          <div className="relative overflow-hidden bg-gray-50 border border-gray-100 rounded-2xl p-4 space-y-4">
             <div className="flex items-center justify-between border-b border-gray-200/50 pb-2.5">
               <span className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                 <MessageSquare size={14} className="text-emerald-600" /> Customer Engagement Box
@@ -168,7 +174,9 @@ export default function CustomerPanel({ customer }) {
                 {templates.map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => setSelectedTemplate(t.id)}
+                    onClick={() => {
+                      if (tier !== "free") setSelectedTemplate(t.id);
+                    }}
                     className={`px-2 py-1 rounded-lg text-[9px] font-bold transition cursor-pointer ${
                       selectedTemplate === t.id
                         ? "bg-white text-emerald-700 shadow-xs border border-gray-200"
@@ -213,6 +221,25 @@ export default function CustomerPanel({ customer }) {
                 Draft SMS
               </a>
             </div>
+
+            {/* Premium Gating Blur Overlay */}
+            {tier === "free" && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-4">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-700 mb-2 shadow-2xs">
+                  <Lock size={14} />
+                </div>
+                <p className="text-xs font-black text-gray-800 uppercase tracking-wider mb-0.5">Customer Engagement Drafts</p>
+                <p className="text-[9px] text-gray-500 max-w-xs mb-3 leading-normal font-medium">
+                  Instant order confirmation WhatsApp alerts & follow-ups require a Grower Plan upgrade.
+                </p>
+                <button
+                  onClick={() => setPaywallOpen(true)}
+                  className="text-[9px] font-black px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs transition cursor-pointer"
+                >
+                  Unlock Template Engagement
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center text-xs text-gray-400">
@@ -254,6 +281,13 @@ export default function CustomerPanel({ customer }) {
           ))}
         </div>
       </div>
+
+      {/* SaaS Upgrade Modal */}
+      <SaaSUpgradeModal 
+        show={paywallOpen}
+        onClose={() => setPaywallOpen(false)}
+        title="Unlock Engagement Templates"
+      />
     </div>
   );
 }
