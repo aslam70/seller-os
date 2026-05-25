@@ -1,5 +1,8 @@
 import { X, Trash2 } from "lucide-react";
 import { ORDER_STATUS } from "../../../lib/constants";
+import { useSubscription } from "../../../features/subscription/hooks/useSubscription";
+import { useSteadfast } from "../../../features/steadfast/useSteadfast";
+import toast from "react-hot-toast";
 
 const statusTimeline = [
   ORDER_STATUS.PENDING,
@@ -177,6 +180,38 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
               ))}
             </select>
           </section>
+
+            {/* Create Consignment (Steadfast) */}
+            {subscription?.tier === "grower" && (
+              <button
+                onClick={async () => {
+                  try {
+                    const payload = {
+                      invoice: order.id?.toString() ?? order.displayId?.toString(),
+                      recipient_name: order.customer,
+                      recipient_phone: order.phone,
+                      recipient_address: order.address,
+                      cod_amount: Number(order.amount) || 0,
+                    };
+                    const result = await createConsignment(payload);
+                    if (result?.consignment) {
+                      toast.success(
+                        `Consignment ${result.consignment.tracking_code} created`
+                      );
+                      // optional: you could store tracking_code in order state here
+                    } else {
+                      toast.error(result?.message ?? "Failed to create consignment");
+                    }
+                  } catch (e) {
+                    toast.error(e?.message ?? "Error creating consignment");
+                  }
+                }}
+                className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-md font-medium"
+              >
+                Create Consignment
+              </button>
+            )}
+
         </div>
       </div>
     </>

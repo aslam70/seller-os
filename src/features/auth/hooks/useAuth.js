@@ -18,8 +18,15 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = (email, password) =>
-    supabase.auth.signUp({ email, password });
+  const signUp = async (email, password) => {
+    // Ensure password meets Supabase minimum (6 characters)
+    if (password.length < 6) {
+      return { error: { message: "Password must be at least 6 characters" } };
+    }
+    // Provide a redirect URL for email confirmation flows
+    const redirectTo = window.location.origin + "/login";
+    return supabase.auth.signUp({ email, password }, { emailRedirectTo: redirectTo });
+  };
 
   const signIn = (email, password) =>
     supabase.auth.signInWithPassword({ email, password });

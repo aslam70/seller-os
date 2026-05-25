@@ -57,7 +57,7 @@ export function useSubscription(currentOrdersCount = 0) {
         .from("profiles")
         .select("tier")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         // If profile doesn't exist yet (new user before trigger fires), default to free

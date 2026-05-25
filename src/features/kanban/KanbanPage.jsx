@@ -1,13 +1,13 @@
 import { useOrders } from "../orders/hooks/useOrders";
 import KanbanBoard from "./components/KanbanBoard";
-
+import Spinner from "../../components/Spinner";
 
 export default function KanbanPage() {
   const { orders, loading, updateStatus } = useOrders();
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full">
-        <span className="text-gray-500">Loading orders...</span>
+        <Spinner size="lg" />
       </div>
     );
   }
