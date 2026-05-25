@@ -118,12 +118,21 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
                   📦 {totalOrders} orders  ✅ {delivered} delivered  ❌ {returned} returned
                 </p>
                 <p className="text-sm">Return Rate: {returnRate.toFixed(1)}%</p>
-                <p className={`text-sm font-medium ${riskLevel === 'High Risk' ? 'text-red-600' : riskLevel === 'Medium Risk' ? 'text-yellow-600' : riskLevel === 'Trusted' ? 'text-emerald-600' : riskLevel === 'New Customer' ? 'text-gray-600' : ''}`}>
-                  {riskLevel === 'High Risk' && '🔴 High Risk'}
-                  {riskLevel === 'Medium Risk' && '🟡 Medium Risk'}
-                  {riskLevel === 'Trusted' && '🟢 Trusted'}
-                  {riskLevel === 'New Customer' && '⚪ New Customer'}
-                </p>
+{riskLevel && (
+  <div className={`flex items-center space-x-1 text-${RISK_BADGE_CONFIG[riskLevel].color}-600`}>
+    {(() => {
+      const IconMap = {
+        trusted: ShieldCheck,
+        medium: ShieldAlert,
+        high: Shield,
+        new_customer: UserPlus,
+      };
+      const Icon = IconMap[riskLevel];
+      return Icon ? <Icon size={16} /> : null;
+    })()}
+    <span>{RISK_BADGE_CONFIG[riskLevel].label}</span>
+  </div>
+)}
               </div>
             </section>
           )}
