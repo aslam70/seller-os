@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabase";
 import { useAuth } from "../../auth/hooks/useAuth";
 
+  // Get current user for blacklist key
+  
+
 /**
  * useCustomerRisk – calculates risk metrics for a given phone number.
  * Excludes the current order (by id) from the aggregation.
@@ -12,6 +15,7 @@ import { useAuth } from "../../auth/hooks/useAuth";
  * @returns {{ loading: boolean, totalOrders: number, delivered: number, returned: number, returnRate: number, riskLevel: string }}
  */
 export function useCustomerRisk(phone, currentId) {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [totalOrders, setTotalOrders] = useState(0);
   const [delivered, setDelivered] = useState(0);

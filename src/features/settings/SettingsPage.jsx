@@ -121,6 +121,21 @@ export default function SettingsPage() {
     }, 1500);
   };
 
+  // Add phone number to blacklist
+  const addToBlacklist = (e) => {
+    e.preventDefault();
+    const trimmed = blacklistInput.trim();
+    if (!trimmed) return;
+    if (blacklist.includes(trimmed)) return;
+    setBlacklist([...blacklist, trimmed]);
+    setBlacklistInput("");
+  };
+
+  // Remove phone number from blacklist
+  const removeFromBlacklist = (phone) => {
+    setBlacklist(blacklist.filter((p) => p !== phone));
+  };
+
   // Quota percentage
   const usagePercentage = orderLimit === Infinity ? 0 : Math.round((orders.length / orderLimit) * 100);
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { PAYMENT_METHODS } from "../../../lib/constants";
 import { useProducts } from "../../products/hooks/useProducts";
 import { useAuth } from "../../auth/hooks/useAuth";
+import { useCustomerRisk } from "../../hooks/useCustomerRisk";
 import { MapPin, Search, Shield } from "lucide-react";
 
 const COURIERS = ["Pathao", "Steadfast", "Redx", "Others"];
@@ -25,6 +26,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [locationTab, setLocationTab] = useState("inside"); // 'inside' or 'outside'
   const inputRef = useRef(null);
+  const { riskLevel: phoneRiskLevel, loading: riskLoading } = useCustomerRisk(form.phone);
   const { products } = useProducts();
 
   // Load custom shop settings defaults
@@ -232,6 +234,12 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
               </div>
 
               {/* Amount */}
+              {phoneRiskLevel === 'high' && (
+                 <div className="flex items-center gap-2 bg-red-100 text-red-800 p-2 rounded-md mt-2">
+                   <Shield className="w-4 h-4" />
+                   <span>High risk phone number detected. Please verify before proceeding.</span>
+                 </div>
+               )}
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Price / Amount (৳)</label>
                 <input
