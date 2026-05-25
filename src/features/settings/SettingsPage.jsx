@@ -248,8 +248,8 @@ export default function SettingsPage() {
             </button>
           </div>
         </form>
-
-{/* Blacklist Section */}
+      )}
+      {/* Blacklist Section */}
 {user && (
   <section className="mt-8">
     <h2 className="text-sm font-bold text-gray-800 border-b border-gray-50 pb-2">Phone Blacklist</h2>
@@ -287,7 +287,7 @@ export default function SettingsPage() {
     </ul>
   </section>
 )}
-      )}
+      
 
       {activeTab === "billing" && (
         <div className="space-y-6 animate-fade-in">
