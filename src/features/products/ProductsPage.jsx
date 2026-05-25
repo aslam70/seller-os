@@ -12,7 +12,7 @@ export default function ProductsPage() {
     <div className="max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold text-gray-900">Products</h1>
-        <button onClick={() => setShowModal(true)} className="btn btn-primary btn-sm gap-1">
+        <button onClick={() => setShowModal(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white py-1.5 px-3 rounded-md text-sm font-medium flex items-center gap-1">
           <Plus size={14} /> Add Product
         </button>
       </div>
