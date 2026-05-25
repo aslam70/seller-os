@@ -2,6 +2,7 @@ import { X, Trash2 } from "lucide-react";
 import { ORDER_STATUS } from "../../../lib/constants";
 import { useSubscription } from "../../../features/subscription/hooks/useSubscription";
 import { useSteadfast } from "../../../features/steadfast/useSteadfast";
+import { useCustomerRisk } from "../../../features/orders/hooks/useCustomerRisk";
 import toast from "react-hot-toast";
 
 const statusTimeline = [
@@ -32,9 +33,11 @@ function formatDate(iso) {
 }
 
 export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }) {
-    const { tier } = useSubscription();
+  const { tier } = useSubscription();
   const { createConsignment } = useSteadfast();
+  const { loading: riskLoading, totalOrders, delivered, returned, returnRate, riskLevel } = useCustomerRisk(order?.phone);
   if (!order) return null;
+
 
   const currentIndex = statusTimeline.indexOf(order.status);
 
@@ -73,7 +76,27 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6 min-h-0 pb-[env(safe-area-inset-bottom)]">
 
-          {/* Customer */}
+          {/* Customer History */}
+          {!riskLoading && (
+            <section className="mt-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Customer History
+              </p>
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm">
+                  📦 {totalOrders} orders  ✅ {delivered} delivered  ❌ {returned} returned
+                </p>
+                <p className="text-sm">Return Rate: {returnRate.toFixed(1)}%</p>
+                <p className={`text-sm font-medium ${riskLevel === 'High Risk' ? 'text-red-600' : riskLevel === 'Medium Risk' ? 'text-yellow-600' : riskLevel === 'Trusted' ? 'text-emerald-600' : riskLevel === 'New Customer' ? 'text-gray-600' : ''}`}>
+                  {riskLevel === 'High Risk' && '🔴 High Risk'}
+                  {riskLevel === 'Medium Risk' && '🟡 Medium Risk'}
+                  {riskLevel === 'Trusted' && '🟢 Trusted'}
+                  {riskLevel === 'New Customer' && '⚪ New Customer'}
+                </p>
+              </div>
+            </section>
+          )}
+          {riskLoading && <div className="animate-pulse h-6 bg-gray-200 rounded w-48 mb-2" />}
           <section>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
               Customer
