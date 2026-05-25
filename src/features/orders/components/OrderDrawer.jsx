@@ -32,6 +32,8 @@ function formatDate(iso) {
 }
 
 export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }) {
+    const { tier } = useSubscription();
+  const { createConsignment } = useSteadfast();
   if (!order) return null;
 
   const currentIndex = statusTimeline.indexOf(order.status);
@@ -182,7 +184,7 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
           </section>
 
             {/* Create Consignment (Steadfast) */}
-            {subscription?.tier === "grower" && (
+            {tier === "grower" && (
               <button
                 onClick={async () => {
                   try {
