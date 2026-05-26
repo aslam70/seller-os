@@ -84,10 +84,10 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
                 Customer History
               </p>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm">
+                <p className="text-sm text-gray-800">
                   📦 {totalOrders} orders  ✅ {delivered} delivered  ❌ {returned} returned
                 </p>
-                <p className="text-sm">Return Rate: {returnRate.toFixed(1)}%</p>
+                <p className="text-sm text-gray-800">Return Rate: {returnRate.toFixed(1)}%</p>
 {riskLevel && (
   <div className={`flex items-center space-x-1 ${RISK_BADGE_CONFIG[riskLevel].colorClass}`}>
     {(() => {
@@ -112,8 +112,8 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
               Customer
             </p>
             <p className="font-semibold text-gray-900">{order.customer}</p>
-            <p className="text-sm text-gray-500">{order.phone}</p>
-            <p className="text-sm text-gray-500">{order.address}</p>
+            <p className="text-sm text-gray-800">{order.phone}</p>
+            <p className="text-sm text-gray-800">{order.address}</p>
           </section>
 
           {/* Order Info */}
@@ -123,7 +123,7 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-xs text-gray-400">Product</p>
+                <p className="text-xs text-gray-500">Product</p>
                 <p className="font-medium text-sm text-gray-800">{order.product}</p>
               </div>
               <div className="rounded-lg bg-gray-50 p-3">
@@ -204,7 +204,7 @@ export default function OrderDrawer({ order, onClose, onStatusChange, onDelete }
               Update Status
             </p>
             <select
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white"
               value={order.status}
               onChange={(e) => onStatusChange(order.id, e.target.value)}
             >

@@ -245,8 +245,8 @@ export default function OrdersPage() {
                   {order.status}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mb-1">{order.product}</p>
-              <div className="flex items-center justify-between text-xs text-gray-400">
+              <p className="text-sm text-gray-800 mb-1">{order.product}</p>
+              <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>
                   ৳{order.amount}
                   {order.phone ? ` · ${order.phone}` : ""}
