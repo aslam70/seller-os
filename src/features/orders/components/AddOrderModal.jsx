@@ -3,7 +3,8 @@ import { PAYMENT_METHODS } from "../../../lib/constants";
 import { useProducts } from "../../products/hooks/useProducts";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { useCustomerRisk } from "../../../hooks/useCustomerRisk";
-import { MapPin, Search, Shield } from "lucide-react";
+import { MapPin, Search, Shield, MessageSquare } from "lucide-react";
+import { useCommentParser } from "../hooks/useCommentParser";
 
 const COURIERS = ["Pathao", "Steadfast", "Redx", "Others"];
 
@@ -26,6 +27,9 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const [locationTab, setLocationTab] = useState("inside"); // 'inside' or 'outside'
   const inputRef = useRef(null);
+  const [showParser, setShowParser] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const { parseComment, parsing } = useCommentParser();
   const { riskLevel: phoneRiskLevel, loading: riskLoading } = useCustomerRisk(form.phone);
   const { products } = useProducts();
 
@@ -127,6 +131,51 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
               <div className="w-10 h-1 rounded-full bg-gray-300" />
             </div>
           </div>
+
+            {/* Comment Parser UI */}
+            <div className="px-5 sm:px-6 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowParser(!showParser)}
+                className="flex items-center gap-2 text-sm text-emerald-600 hover:underline"
+              >
+                <MessageSquare size={14} />
+                {showParser ? 'Hide' : 'Parse comment'}
+              </button>
+              {showParser && (
+                <div className="mt-2 flex flex-col gap-2">
+                  <textarea
+                    rows={3}
+                    placeholder="Paste Facebook comment here..."
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    className="w-full border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const data = await parseComment(commentText);
+                      if (data) {
+                        setForm((prev) => ({
+                          ...prev,
+                          customer: data.customer || prev.customer,
+                          phone: data.phone || prev.phone,
+                          address: data.address || prev.address,
+                          product: data.product || prev.product,
+                          amount: data.amount || prev.amount,
+                        }));
+                        setShowParser(false);
+                        setCommentText("");
+                      }
+                    }}
+                    disabled={parsing || !commentText.trim()}
+                    className="self-start bg-emerald-600 text-white px-3 py-1 rounded-md text-sm hover:bg-emerald-700 disabled:opacity-50"
+                  >
+                    {parsing ? 'Parsing...' : 'Parse'}
+                  </button>
+                </div>
+              )}
+            </div>
 
           {/* Scrollable form */}
           <div className="overflow-y-auto px-5 sm:px-6 py-4 space-y-4 pb-6 custom-scrollbar">
@@ -232,12 +281,13 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
                 />
               </div>
-              {phoneRiskLevel === 'high' && (
-                <div className="col-span-2 flex items-center gap-2 bg-red-100 text-red-800 p-2 rounded-md">
-                  <Shield className="w-4 h-4" />
-                  <span>High risk phone number detected. Please verify before proceeding.</span>
-                </div>
-              )}
+{phoneRiskLevel === 'high' && (
+  <div className="col-span-2 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-600">
+    <Shield size={14} />
+    <span>High-risk customer — frequent returns detected</span>
+  </div>
+)}
+              
               {/* Amount */}
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Price / Amount (৳)</label>

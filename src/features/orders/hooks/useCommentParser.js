@@ -6,7 +6,7 @@ export function useCommentParser() {
   async function parseComment(text) {
     setParsing(true);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/functions/v1/parse-comment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
