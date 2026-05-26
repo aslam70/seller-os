@@ -149,7 +149,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                     placeholder="Paste Facebook comment here..."
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    className="w-full border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full border border-gray-200 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                   />
                   <button
                     type="button"
@@ -241,7 +241,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                       }
                     }}
                     placeholder="Search or type a name..."
-                    className="w-full border border-gray-200 rounded-xl pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full border border-gray-200 rounded-xl pl-3 pr-8 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                   />
                   <Search size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 </div>
@@ -278,7 +278,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   placeholder="01xxxxxxxxx"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                 />
               </div>
 {phoneRiskLevel === 'high' && (
@@ -297,7 +297,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   placeholder="0.00"
                   value={form.amount}
                   onChange={(e) => setForm({ ...form, amount: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 font-bold"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 font-bold text-gray-900"
                 />
               </div>
 
@@ -308,7 +308,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   <select
                     onChange={handleProductSelect}
                     value={products.find(p => p.name === form.product)?.id || ""}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                   >
                     <option value="">Choose item...</option>
                     {products.map((p) => (
@@ -323,7 +323,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                     placeholder="Type manually..."
                     value={form.product}
                     onChange={(e) => setForm({ ...form, product: e.target.value })}
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                   />
                 )}
                 {/* Fallback typing box for customized sales in catalog mode */}
@@ -333,7 +333,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                     placeholder="Or type custom product manually..."
                     value={form.product}
                     onChange={(e) => setForm({ ...form, product: e.target.value })}
-                    className="w-full mt-1.5 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full mt-1.5 border border-gray-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                   />
                 )}
               </div>
@@ -346,7 +346,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   placeholder="Street name, area, district"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                 />
               </div>
 
@@ -368,7 +368,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                 <select
                   value={form.courier}
                   onChange={(e) => setForm({ ...form, courier: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                 >
                   {COURIERS.map((c) => (<option key={c}>{c}</option>))}
                 </select>
@@ -380,7 +380,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                 <select
                   value={form.payment}
                   onChange={(e) => setForm({ ...form, payment: e.target.value })}
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 text-gray-900"
                 >
                   {PAYMENT_METHODS.map((p) => (<option key={p}>{p}</option>))}
                 </select>
@@ -394,7 +394,7 @@ export default function AddOrderModal({ show, onClose, onAdd, customers = [] }) 
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
                   rows={2}
                   placeholder="Customer preference, delivery timings..."
-                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none text-gray-900"
                 />
               </div>
             </div>
