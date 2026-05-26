@@ -213,7 +213,7 @@ export default function OrdersPage() {
             <EmptyState
               icon={ShoppingBag}
               title="No orders yet"
-              description="Add your first order to start tracking sales and deliveries."
+              description="Facebook এ order আসলে এখানে add করুন\nComment paste করুন — AI বাকিটা করবে।\nঅথবা manually add করুন।"
               action={
                 <button
                   onClick={handleAddOrderClick}
@@ -283,7 +283,7 @@ export default function OrdersPage() {
                     <EmptyState
                       icon={ShoppingBag}
                       title="No orders yet"
-                      description="Add your first order to start tracking sales and deliveries."
+                      description="Facebook এ order আসলে এখানে add করুন\nComment paste করুন — AI বাকিটা করবে।\nঅথবা manually add করুন।"
                       action={
                         <button
                           onClick={handleAddOrderClick}
