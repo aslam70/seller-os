@@ -5,7 +5,7 @@ export default function EmptyState({ icon: Icon, title, description, action }) {
         <Icon size={24} className="text-emerald-500" />
       </div>
       <p className="text-sm font-semibold text-gray-800 mb-1">{title}</p>
-      <p className="text-sm text-gray-400 max-w-xs leading-relaxed">{description}</p>
+      <p className="text-sm text-gray-400 max-w-xs leading-relaxed whitespace-pre-line">{description}</p>
       {action && (
         <div className="mt-5">{action}</div>
       )}
